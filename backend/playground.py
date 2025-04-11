@@ -134,3 +134,33 @@ if __name__ == "__main__":
 
     print("Final result:")
     print(result.model_dump())
+
+
+
+from langgraph.prebuilt import ToolExecutor
+from langgraph.graph import StateGraph
+
+tool_executor = ToolExecutor([maximo_operation])
+
+def maximo_agent_step(state: AgentState) -> AgentState:
+    messages = [
+        SystemMessage(content=...),
+        HumanMessage(content=state.user_input)
+    ]
+
+    # Step 1: Get the LLM response (might be tool call)
+    result = llm.invoke(messages)
+
+    # Step 2: If it's a tool call, execute it
+    if isinstance(result, dict) and 'tool_calls' in result:
+        for tool_call in result['tool_calls']:
+            tool_name = tool_call['name']
+            tool_args = tool_call['args']
+            # You can either use LangChain's tool execution logic
+            # or just call your function directly
+            if tool_name == "maximo_operation":
+                output = maximo_operation(**tool_args)
+                # Add to state or return directly
+                return {**state, "output": output}
+    else:
+        return {**state, "output": result.content}

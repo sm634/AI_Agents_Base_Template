@@ -1,5 +1,6 @@
 from langgraph.graph import StateGraph
 
+from agents.base_agent import AgentState
 from agents.supervisor import  SupervisorAgent
 from agents.custom_agents import VectorDBAgent, MaximoAgent
 
@@ -8,19 +9,22 @@ from agents.custom_agents import VectorDBAgent, MaximoAgent
 def build_graph():
     graph = StateGraph(AgentState)
 
-    supervisor = SupervisorAgent(llm=llm)
-    maximo = MaximoAgent(llm=llm)
-    vector_db = VectorDBAgent(llm=llm)
+    supervisor = SupervisorAgent()
+    maximo = MaximoAgent()
+    vector_db = VectorDBAgent()
 
-    graph.add_node("supervisor", supervisor.run)
-    graph.add_node("maximo", maximo.run)
-    graph.add_node("vector_db", vector_db.run)
-    graph.add_node("supervisor_postprocess", supervisor.postprocess)
+    # Define the nodes of the graph
+    graph.add_node("router", supervisor.supervisor_router)
+    graph.add_node("maximo_agent", maximo.perform_maximo_operation)
+    graph.add_node("vector_db_agent", vector_db.handle_input)
+    graph.add_node("supervisor_evaluation", supervisor.supervisor_evaluation)
 
-    graph.set_entry_point("supervisor")
-    graph.add_conditional_edges("supervisor", supervisor_router)
-    graph.add_edge("maximo", "supervisor_postprocess")
-    graph.add_edge("vector_db", "supervisor_postprocess")
-    graph.set_finish_point("supervisor_postprocess")
-
+    # Sepcify the edges of the graph
+    graph.set_entry_point("router")
+    graph.add_conditional_edges("router", supervisor.supervisor_router, {'maximo': "maximo_agent", 'vector_db': "vector_db_agent"})
+    graph.add_edge("maximo_agent", "supervisor_evaluation")
+    graph.add_edge("vector_db_agent", "supervisor_evaluation")
+    graph.set_finish_point("supervisor_evaluation")
+    
+    # Return the Compiled the graph
     return graph.compile()

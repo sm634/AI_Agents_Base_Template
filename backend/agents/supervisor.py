@@ -11,10 +11,6 @@ from agents.base_agent import BaseAgent, AgentState
 # Exotic libraries
 from langchain_core.messages import HumanMessage, SystemMessage
 from langchain_ibm import ChatWatsonx
-from pydantic import BaseModel
-
-from dotenv import load_dotenv
-_ = load_dotenv()
 
 
 class SupervisorAgent(BaseAgent):
@@ -25,11 +21,11 @@ class SupervisorAgent(BaseAgent):
 
         super().__init__(name)
 
-        # instantiate the parameters for the agent. 
+        # instantiate the parameters for router part of the agent. 
         self.router_params = Config.supervisor_router_params
         self.model_id = self.router_params['model_id']
         self.model_params = self.router_params['model_parameters']
-        self.llm = ChatWatsonx(
+        self.router_llm = ChatWatsonx(
             model_id=self.model_id,
                 url=os.environ["WATSONX_URL"],
                 apikey=os.environ["IBM_CLOUD_APIKEY"],
@@ -38,7 +34,7 @@ class SupervisorAgent(BaseAgent):
             )
 
 
-        self.router_system_message = SystemMessage(content="""You are a routing agent. Route the query to 'maximo', 'vector_db', or 'unknown' based on which source the query is best answered by. 
+        self.router_system_message = SystemMessage(content="""You are an excellent routing agent. Route the query to 'maximo', 'vector_db', or 'unknown' based on which source the query is best answered by. 
                                             To help you make that decision, look for key words in the query that is most closely associated to one of those systems.
                                             Ensure that You only provide single word answer with one of the following: 'maximo', 'vector_db', 'unknown'.
                                             Use the examples below to help you.
@@ -57,9 +53,30 @@ class SupervisorAgent(BaseAgent):
                                             Now classify the user input below.
                                             user_input: {user_input}
                                             response:""")
+        
+        # instantiate the parameters for the evaluation part of the agent.        # instantiate the parameters for router part of the agent. 
+        self.evaluator_params = Config.supervisor_evaluator_params
+        self.model_id = self.evaluator_params['model_id']
+        self.model_params = self.evaluator_params['model_parameters']
+        self.evaluator_llm = ChatWatsonx(
+            model_id=self.model_id,
+                url=os.environ["WATSONX_URL"],
+                apikey=os.environ["IBM_CLOUD_APIKEY"],
+                project_id=os.environ["WATSONX_PROJECT_ID"],
+                params=self.model_params
+            )
+        
+        self.evaluation_prompt = SystemMessage(content="""You are an excellent supervisor and a friendly customer facing assistant. 
+                                                You are tasked with evaluating the response from an agent.
+                                                You will receive a user input and the response from an agent. 
+                                                Your job is to evaluate if the response is suitably relevant to the user input or query.
+                                                If the response has relevant answers to the query, ensure it is expressed in a very friendly style to be provided to the human user.
+                                                If the response is not relevant to the user input, provide the answer in a friendly style to the user, and if there are some pieces of information in the query from the user that could help in answering the query. Gently nudge them to provide it.
+                                                response_to_evaluate: {response}
+                                                evaluation:""")
 
 
-    def classify_query(self, state: AgentState) -> str:
+    def supervisor_router(self, state: AgentState) -> str:
         user_input = HumanMessage(
             content=f"{state.user_input}"
         )
@@ -67,13 +84,37 @@ class SupervisorAgent(BaseAgent):
             self.router_system_message,
             user_input
         ]
-        response = self.llm.invoke(messages)
-        return response
+        response = self.router_llm.invoke(messages)
+        if 'maximo' in response.content.lower():
+            state.supervisor_decision = "maximo"
+        elif 'vector_db' in response.content.lower():
+            state.supervisor_decision = "vector_db"
+        else:
+            state.supervisor_decision = "unknown"
+        state.supervisor_decision = response.content.lower()
+        state.memory_chain.append({
+            "input": state.user_input,
+            "supervisor_decision": state.supervisor_decision,
+        })
+        return state.supervisor_decision
 
-    def evaluate_response(self, user_input: str, response: str) -> bool:
-        messages = self.evaluation_prompt.format_messages(query=user_input, response=response)
-        result = self.llm.invoke(messages)
-        return "yes" in result.content.strip().lower()
+
+    def supervisor_evaluation(self, state: AgentState) -> bool:
+        user_input = HumanMessage(
+            content=f"{state.user_input}"
+        )
+        messages = [
+            self.evaluation_prompt,
+            user_input,
+            HumanMessage(content=f"{state.maximo_agent_response or state.vector_search_result}")
+        ]
+        result = self.evaluator_llm.invoke(messages)
+        # update the state with the evaluation result.
+        state.memory_chain.append({
+            'final_response': result.content
+        })
+        state.memory_chain[-1]["output"] = result.content
+        return result.content
 
     def handle_input(self, state: AgentState):
         decision = self.classify_query(state.user_input.content)
