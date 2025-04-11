@@ -1,6 +1,5 @@
 from src.build_graph import build_graph
 from agents.base_agent import AgentState
-from IPython.display import Image
 
 
 if __name__ == "__main__":
@@ -9,8 +8,14 @@ if __name__ == "__main__":
 
     with open("graph_output.png", "wb") as image_file:
         image_file.write(graph.get_graph().draw_png())
+    
+    print("Graph has been built and saved as graph_output.png")
 
-    input_state = AgentState(user_input="What is the status, description and priority of work order number 5012?")
-    result = graph.invoke(input_state)
+    result = graph.invoke({
+            "user_input": "What is the status, description and priority of work order number 5012?"
+        },
+    )
     print("Final state:")
-    print(result.json(indent=2))
+    print(result)
+    
+    breakpoint()

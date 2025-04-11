@@ -33,7 +33,9 @@ if args.function:
     data = test_function()
 else:
     # If no test name is provided, run all tests
-    data = test_get_maximo_data()
-    data = test_generate_maximo_payload() 
-
-breakpoint()
+    test_get_maximo_data()
+    test_generate_maximo_payload()
+    test_maximo_tool_use()
+    test_get_maximo_wo_details()
+    test_maximo_supervisor_response()
+    print("All tests executed successfully.")

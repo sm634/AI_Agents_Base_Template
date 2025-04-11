@@ -78,7 +78,7 @@ class SupervisorAgent(BaseAgent):
 
     def supervisor_router(self, state: AgentState) -> str:
         user_input = HumanMessage(
-            content=f"{state.user_input}"
+            content=f"{state['user_input']}"
         )
         messages = [
             self.router_system_message,
@@ -86,49 +86,37 @@ class SupervisorAgent(BaseAgent):
         ]
         response = self.router_llm.invoke(messages)
         if 'maximo' in response.content.lower():
-            state.supervisor_decision = "maximo"
+            state['supervisor_decision'] = "maximo"
         elif 'vector_db' in response.content.lower():
-            state.supervisor_decision = "vector_db"
+            state['supervisor_decision'] = "vector_db"
         else:
-            state.supervisor_decision = "unknown"
-        state.supervisor_decision = response.content.lower()
-        state.memory_chain.append({
-            "input": state.user_input,
-            "supervisor_decision": state.supervisor_decision,
+            state['supervisor_decision'] = "unknown"
+        state['supervisor_decision'] = response.content.lower()
+        state['memory_chain'].append({
+            "input": state['user_input'],
+            "supervisor_decision": state['supervisor_decision'],
         })
-        return state.supervisor_decision
+
+        return {
+            "supervisor_decision": state['supervisor_decision']
+        }
 
 
     def supervisor_evaluation(self, state: AgentState) -> bool:
         user_input = HumanMessage(
-            content=f"{state.user_input}"
+            content=f"{state['user_input']}"
         )
         messages = [
             self.evaluation_prompt,
             user_input,
-            HumanMessage(content=f"{state.maximo_agent_response or state.vector_search_result}")
+            HumanMessage(content=f"{state['maximo_agent_response'] or state['vector_search_result']}")
         ]
         result = self.evaluator_llm.invoke(messages)
         # update the state with the evaluation result.
-        state.memory_chain.append({
+        state['memory_chain'].append({
             'final_response': result.content
         })
-        state.memory_chain[-1]["output"] = result.content
-        return result.content
-
-    def handle_input(self, state: AgentState):
-        decision = self.classify_query(state.user_input.content)
-        state.supervisor_decision = decision
-        state.memory_chain.append({
-            "input": state.user_input,
-            "decision": decision,
-            "output": "PENDING"
-        })
-        return state
-
-    def postprocess(self, state: Dict[str, Any]) -> Dict[str, Any]:
-        output = state.get("maximo_response") or state.get("vector_search_result")
-        success = self.evaluate_response(state["user_input"], output)
-        state["memory_chain"][-1]["output"] = output
-        state["memory_chain"][-1]["success"] = success
-        return state
+        state['memory_chain'][-1]["output"] = result.content
+        return {
+            "evaluation": result.content
+        }

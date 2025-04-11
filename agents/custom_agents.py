@@ -6,8 +6,6 @@ from connectors.maximo_connector import MaximoConnector
 
 from langchain_core.messages import HumanMessage, SystemMessage
 from langchain_ibm import ChatWatsonx
-from langchain_core.runnables import Runnable
-from langchain_core.tools import tool
 
 from config import Config
 import os
@@ -77,31 +75,6 @@ class MaximoAgent(BaseAgent):
                                     }.
                                     Now classify the type of request the user is making and generate the associated params in json.
                                     <response>""")
-    
-
-
-        # instantiate the parameters for the agent.
-        self.agent_params = Config.maximo_agent_params
-        self.model_id = self.agent_params['model_id']
-        self.model_params = self.agent_params['model_parameters']
-        self.llm = ChatWatsonx(
-            model_id=self.model_id,
-                url=os.environ["WATSONX_URL"],
-                apikey=os.environ["IBM_CLOUD_APIKEY"],
-                project_id=os.environ["WATSONX_PROJECT_ID"],
-                params=self.model_params
-            )
-        
-        # define the tools that the agent will have access to.
-        self.tools = [self.get_maximo_wo_details, self.update_maximo_wo_details]
-        self.llm_with_tools = self.llm.bind_tools(self.tools)
-
-        # define the system message for the agent.
-        self.system_message = SystemMessage(content="""You are a Maximo expert. You are provided with two tools:
-                                            1. get_maximo_wo_details(state: AgentState) - For retrieving Maximo work order details.
-                                            2. update_maximo_wo_details(state: AgentState) - For updating or posting changes to a Maximo work order.
-                                            Given a user query, determine which tool to invoke, and use it with the `state` object provided. You do NOT need to return the payload itself—just the result of the correct tool call. Always use one of the tools.
-                                            """)
 
 
     def generate_maximo_payload(self, state: AgentState) -> Dict[str, Any]:
@@ -112,7 +85,7 @@ class MaximoAgent(BaseAgent):
         """
         # Check if the user input is classified as a Maximo operation
         user_input = HumanMessage(
-            content=f"{state.user_input}"
+            content=f"{state['user_input']}"
         )
         messages = [
             self.payload_generator_system_message,
@@ -120,57 +93,15 @@ class MaximoAgent(BaseAgent):
         ]
 
         response = self.payload_generator_llm.invoke(messages)
-        state.maximo_payload = response.content
+        state['maximo_payload'] = response.content
         # Update the state memory_chain
-        state.memory_chain.append({
-            "maximo_payload": state.maximo_payload
+        state['memory_chain'].append({
+            "maximo_payload": state['maximo_payload']
         })
     
-        return state
-
-    # @tool(description="Perform a get request with Maximo API.")
-    def get_maximo_wo_details(self, state: Annotated[AgentState, "Agent state containing user input and payload"]) -> dict:
-        """
-        Performs the Maximo get request based on the generated payload.
-        :param state: The state of the agent containing the maximo_payload.
-        :return: A dictionary containing the Maximo operation result."""
-        payload = ast.literal_eval(state.maximo_payload)
-        params = payload.get("params")
-
-        result = self.maximo_connector.get_workorder_details(params)
-
-        # update the result
-        state.maximo_agent_response = result
-        # Update the state memory_chain
-        state.memory_chain.append({
-            "input": state.user_input,
-            "operation": 'get_maximo_wo_details',
-            "maximo_result": result
-        })
-
-        return result
-        
-    # @tool(description="Perform a Post or update request with Maximo API.")
-    def update_maximo_wo_details(self, state: Annotated[AgentState, "Agent state containing user input and payload"]) -> Dict[str, Any]:
-        """
-        Performs a Post or update request based on the generated payload.
-        :param state: The state of the agent containing the maximo_payload.
-        :return: A dictionary containing the Maximo operation result."""
-        payload = ast.literal_eval(state.maximo_payload)
-        params = payload.get("params")
-
-        result = self.maximo_connector.post_workorder_details(params)
-        # update the result
-        state.maximo_agent_response = result
-        # Update the state memory_chain
-        state.memory_chain.append({
-            "input": state.user_input,
-            "operation": 'update_maximo_wo_details',
-            "maximo_result": result
-        })
-
-
-        return result
+        return {
+            "maximo_payload": state['maximo_payload']
+        }
     
     def perform_maximo_operation(self, state: AgentState):
         """
@@ -179,7 +110,7 @@ class MaximoAgent(BaseAgent):
         :return: A dictionary containing the Maximo payload.
         """
         # Check to see the maximo payload returned, and the response type to perform the correct action.
-        payload = ast.literal_eval(state.maximo_payload)
+        payload = ast.literal_eval(state['maximo_payload'])
         request_type = payload.get("request_type")
         params = payload.get("params")
 
@@ -191,22 +122,17 @@ class MaximoAgent(BaseAgent):
             result = {
                 "message": "This query is not related to Maximo."
             }
-        # Update the state memory_chain
+
         # update the result
-        state.maximo_agent_response = result
+        state['maximo_agent_response'] = result
         # Update the state memory_chain
-        state.memory_chain.append({
+        state['memory_chain'].append({
             "maximo_result": result
         })
 
-        return state
-
-def handle_input(self, state: Dict[str, Any]) -> Dict[str, Any]:
-    if state.get("supervisor_decision") == "maximo":
-        messages = self.prompt.format_messages(query=state["user_input"])
-        response = self.llm.invoke(messages)
-        state["maximo_response"] = response.content
-    return state
+        return {
+            "maximo_agent_response": result
+        }
 
 
 class VectorDBAgent(BaseAgent):
@@ -225,8 +151,6 @@ class VectorDBAgent(BaseAgent):
                 project_id=os.environ["WATSONX_PROJECT_ID"],
                 params=self.model_params
             )
-        self.tools = self.agent_params['tools']
-        self.llm = self.llm.bind_tools(self.tools)
 
         self.system_message = SystemMessage(content="""You are a Maximo expert. Your job is to translate human or user query into a maximo
                                             payload that can be sent across as part of an API Get or Post request. When you receive the human
@@ -263,8 +187,3 @@ class VectorDBAgent(BaseAgent):
                                             user_input: {user_input}
                                             response:""")
 
-    def handle_input(self, state: BaseModel):
-        if state.get("supervisor_decision") == "vector_db":
-            messages = "To be implemented"
-            state.vector_search_result = messages
-        return state
