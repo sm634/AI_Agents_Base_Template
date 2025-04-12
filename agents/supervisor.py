@@ -113,10 +113,10 @@ class SupervisorAgent(BaseAgent):
         ]
         result = self.evaluator_llm.invoke(messages)
         # update the state with the evaluation result.
+        state['final_response'] = result.content
         state['memory_chain'].append({
             'final_response': result.content
         })
-        state['memory_chain'][-1]["output"] = result.content
         return {
             "evaluation": result.content
         }

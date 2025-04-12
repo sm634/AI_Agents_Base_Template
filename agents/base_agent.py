@@ -20,6 +20,7 @@ class AgentState(TypedDict):
     maximo_payload: Optional[str] = None
     maximo_agent_response: Optional[str] = None
     vector_search_result: Optional[str] = None
+    final_response: Optional[str] = None
     memory_chain: Annotated[List[Dict[str, Any]], operator.add] = []
 
 
