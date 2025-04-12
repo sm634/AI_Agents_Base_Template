@@ -7,19 +7,20 @@ In this framework or design what determines or separates each agent are the foll
 """
 
 
-from typing import Dict, Any, Optional, List, Annotated
+from typing import Dict, Any, Optional, List, Annotated, TypedDict
 from pydantic import BaseModel
 from config import Config
 from langchain_core.messages import SystemMessage, HumanMessage
 import operator
 
 # ----- Shared State Schema -----
-class AgentState(BaseModel):
+class AgentState(TypedDict):
     user_input: str
     supervisor_decision: Optional[str] = None
     maximo_payload: Optional[str] = None
     maximo_agent_response: Optional[str] = None
     vector_search_result: Optional[str] = None
+    final_response: Optional[str] = None
     memory_chain: Annotated[List[Dict[str, Any]], operator.add] = []
 
 

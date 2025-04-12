@@ -40,8 +40,10 @@ class MaximoConnector():
         :params: The payload will be passed on as the request body. It will
         look as the following:
         params = {
+            "oslc.where": "wonum=2",
             "wopriority": "1",
-            "siteid": "BEDFORD"
+            "siteid": "BEDFORD",
+            "lean"=1
         }
         """
 
@@ -56,13 +58,10 @@ class MaximoConnector():
 
         # Send the request
         response = requests.post(self.url_post, headers=headers, params=params)
-
         # Check the response
         if response.status_code in [200, 201, 204]:
-            print("Workorder updated successfully.")
-            if response.content:
-                data = response.json()
-                return data
+            print("Workorder updated successfully.")        
+            return response
         else:
             print(f"Failed to update workorder: {response.status_code}")
             print(response.text)
