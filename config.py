@@ -70,3 +70,14 @@ class Config:
         },
         "model_id": "mistralai/mistral-large"
     }
+    milvus_agent_params = {
+        "model_parameters": {
+            "decoding_method": "greedy",
+            "max_new_tokens": 500,
+            "min_new_tokens": 1,
+            "temperature": 0.0,
+            "top_k": 50,
+            "top_p": 1,
+        },
+        "model_id": "mistralai/mistral-large"
+    }

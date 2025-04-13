@@ -59,56 +59,67 @@ class SupervisorAgent(BaseAgent):
         # call the llm with the message.
         supervisor_response = self.llm_with_tools.invoke(message)
 
-        for tool_call in supervisor_response.tool_calls:
-            selected_tool = self.tools_dict[tool_call['name']]
-            print(f"Calling: {tool_call['name']}")
+        if len(supervisor_response.tool_calls) > 0:
 
-            # call the tool with the arguments.
-            if selected_tool.name == "supervisor_router":
+            for tool_call in supervisor_response.tool_calls:
+                selected_tool = self.tools_dict[tool_call['name']]
+                print(f"Calling: {tool_call['name']}")
 
-                # set up the system prompt template for the router.
-                router_prompt = SupervisorPrompts.routing_prompt.format(user_input=state['user_input'])
-                
-                # set up the tool input.
-                tool_input = {
-                    "user_input": state['user_input'],
-                    "llm": self.router_llm,
-                    "router_prompt": SystemMessage(router_prompt)
-                }
-                
-                # invoke the tool.
-                tool_response = selected_tool.invoke(tool_input)
+                # call the tool with the arguments.
+                if selected_tool.name == "supervisor_router":
 
-                # update the state with the tool response.
-                state['supervisor_decision'] = tool_response
-                state.setdefault('memory_chain', []).append({
-                    'supervisor_decision': state['supervisor_decision']
-                })
+                    # set up the system prompt template for the router.
+                    router_prompt = SupervisorPrompts.routing_prompt.format(user_input=state['user_input'])
+                    
+                    # set up the tool input.
+                    tool_input = {
+                        "user_input": state['user_input'],
+                        "llm": self.router_llm,
+                        "router_prompt": SystemMessage(router_prompt)
+                    }
+                    
+                    # invoke the tool.
+                    tool_response = selected_tool.invoke(tool_input)
 
-            elif selected_tool.name == "supervisor_evaluation":
-                # set up the system prompt template for the evaluation.
-                evaluation_prompt = SupervisorPrompts.evaluation_prompt.format(
-                    user_input=state['user_input'],
-                    agent_response=state['maximo_agent_response'] or state['milvus_agent_response'])
-                
-                # set up the tool input.
-                tool_input = {
-                    "user_input": state['user_input'],
-                    "agent_response": state['maximo_agent_response'] or state['milvus_agent_response'],
-                    "llm": self.evaluation_llm,
-                    "evaluation_prompt": SystemMessage(evaluation_prompt)
-                }
+                    # update the state with the tool response.
+                    state['supervisor_decision'] = tool_response
+                    state.setdefault('memory_chain', []).append({
+                        'supervisor_decision': state['supervisor_decision']
+                    })
 
-                # invoke the tool.
-                tool_response = selected_tool.invoke(tool_input)
-                # update the state with the tool response.
-                state['supervisor_decision'] = tool_response
-                state['memory_chain'].append({
-                    'final_response': tool_response
-                })        
+                    assert tool_response in ["maximo", "vector_db", "unknown"], f"Invalid tool response: {tool_response}"
+                    
+                    return {"supervisor_decision": tool_response}
 
-        # update the states.
+                elif selected_tool.name == "supervisor_evaluation":
+                    # set up the system prompt template for the evaluation.
+                    evaluation_prompt = SupervisorPrompts.evaluation_prompt.format(
+                        user_input=state['user_input'],
+                        agent_response=state['maximo_agent_response'] or state['milvus_agent_response']
+                        )
+                    
+                    # set up the tool input.
+                    tool_input = {
+                        "user_input": state['user_input'],
+                        "agent_response": state['maximo_agent_response'] or state['milvus_agent_response'],
+                        "llm": self.evaluation_llm,
+                        "evaluation_prompt": SystemMessage(evaluation_prompt)
+                    }
 
-        return {
-            "supervisor_decision": tool_response
-        }
+                    # invoke the evaluation.
+                    final_response = selected_tool.invoke(tool_input)
+                    # update the state with the tool response.
+                    state['final_response'] = final_response
+                    state['memory_chain'].append({
+                        'final_response': tool_response
+                    })        
+
+                    return {"final_response": final_response}
+            
+        else:
+            state['maximo_agent_response'] = "unknown"
+            state['milvus_agent_response'] = "unknown"
+            # set up the system prompt template for the evaluation.
+        return {"final_response": "unknown"}
+            
+        

@@ -7,10 +7,8 @@ from tools.maximo_agent_tools import MaximoAgentTools
 from utils.handle_configs import get_llm
 
 from langchain_core.messages import HumanMessage, SystemMessage
-from langchain_ibm import ChatWatsonx
 
 from config import Config
-import os
 
 
 class MaximoAgent(BaseAgent):
@@ -78,12 +76,14 @@ class MaximoAgent(BaseAgent):
                     }
 
                 # invoke the tool and get the result.
-                tool_result = self.tools_dict[selected_tool].invoke(tool_input)
+                maximo_agent_response = self.tools_dict[selected_tool].invoke(tool_input)
                 # update the state with the tool result.
                 state['maximo_agent_response'] = tool_result
                 state['memory_chain'].append({
-                    'maximo_agent_response': state['maximo_agent_response'],
+                    'maximo_agent_response': agent_response,
                 })
+
+                return {"maximo_agent_response": maximo_agent_response}
 
             elif selected_tool == "generate_maximo_payload":
                 # set the input parameters or arguments for the tool.
@@ -93,69 +93,11 @@ class MaximoAgent(BaseAgent):
                     "llm": self.payload_generator_llm
                 }
                 # invoke the tool and get the result.
-                tool_result = self.tools_dict[selected_tool].invoke(tool_input)
+                maximo_payload = self.tools_dict[selected_tool].invoke(tool_input)
                 # update the state with the tool result.
-                state['maximo_payload'] = tool_result
+                state['maximo_payload'] = maximo_payload
                 state['memory_chain'].append({
                     'maximo_payload': state['maximo_payload'],
                 })
             
-
-        return {
-            "tool_calls": state['tool_calls'],
-            "tool_result": tool_result
-        }
-
-
-class VectorDBAgent(BaseAgent):
-    def __init__(self, name="vector_db"):
-        
-        super().__init__(name)
-
-        # instantiate the parameters for the agent.
-        self.agent_params = Config.maximo_agent_params
-        self.model_id = self.agent_params['model_id']
-        self.model_params = self.agent_params['model_parameters']
-        self.llm = ChatWatsonx(
-            model_id=self.model_id,
-                url=os.environ["WATSONX_URL"],
-                apikey=os.environ["IBM_CLOUD_APIKEY"],
-                project_id=os.environ["WATSONX_PROJECT_ID"],
-                params=self.model_params
-            )
-
-        self.system_message = SystemMessage(content="""You are a Maximo expert. Your job is to translate human or user query into a maximo
-                                            payload that can be sent across as part of an API Get or Post request. When you receive the human
-                                            query, you should decide if a maximo operation is required to send a Get or Post request to action or
-                                            answer the query to the maximo database. Use the tool at your disposal to decide if to use request_type: get or post and what payload
-                                            you should pass to the tool function you have at your disposal.
-                                            Once you decide on the operation type, such as Get or Post, you should generate a json or python dictionary that fulfills the query.
-                                            If the query does not have all the required information, use the example below to and the information from the query
-                                            the best you can to generate a consistent response, like in the example.
-                                            Use the examples below to help you. 
-                                            <example-get>
-                                            user_input: What is the status, description and priority of work order number 5012?
-                                            response: {
-                                                        request_type: "get",
-                                                        params: {
-                                                            "oslc.where": "wonum=5012",
-                                                            "oslc.select": "wonum,description,wopriority,createdby,workorderid,status",
-                                                            "lean": lean,
-                                                            "ignorecollectionref": ignorecollectionref
-                                                            }
-                                                        }
-                                            </example-get>
-                                            <example-post>
-                                            user_input: Make a change to the work order priority and change the site to Bedford.
-                                            response: {
-                                                        request_type: "post",
-                                                        params = {
-                                                            "wopriority": "1",
-                                                            "siteid": "BEDFORD"
-                                                            }
-                                                        }
-                                            </example-post>
-                                            Now classify the type of request the user is making and generate the associated params in json.
-                                            user_input: {user_input}
-                                            response:""")
-
+                return {"maximo_payload": maximo_payload}

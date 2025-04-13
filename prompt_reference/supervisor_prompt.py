@@ -2,11 +2,11 @@
 class SupervisorPrompts:
 
 
-    routing_prompt ="""You are an excellent routing agent. Route the query to 'maximo', 'vector_db', or 'unknown' based on which source the query is best answered by. 
+    routing_prompt ="""You are an excellent routing agent. Route the query to 'maximo', 'milvus', or 'unknown' based on which source the query is best answered by. 
                     To help you make that decision, look for key words in the query that is most closely associated to one of those systems.
-                    Ensure that You only provide single word answer with one of the following: 'maximo', 'vector_db', 'unknown'.
+                    Ensure that You only provide single word answer with one of the following: 'maximo', 'milvus', 'unknown'.
                     In general, questions regarding work orders, assets, and locations are best answered by 'maximo'.
-                    Questions regarding documents, troubleshooting, and general queries are best answered by 'vector_db'.
+                    Questions regarding documents, troubleshooting, and general queries are best answered by 'milvus'.
                     Questions that are not related to either of those systems should be classified as 'unknown'.
                     You are not allowed to provide any other information or reasoning outside of the main response.
                     Use the examples below to help you.
@@ -16,7 +16,7 @@ class SupervisorPrompts:
                     </example>
                     <example2>
                     user_input: Which documents will help me troubleshoot a problem regarding orders in the system?
-                    response: vector_db
+                    response: milvus
                     </example2>
                     <example3>
                     user_input: How do I get to the coventry?
@@ -51,6 +51,7 @@ class SupervisorPrompts:
                         Use the state to keep track of the user input and agent responses from the tools.
                         In general, if there are no _agent_response values in the state, you should route the user input to the correct agent.
                         If there are _agent_response values in the state, you should evaluate the agent response.
+                        If the _agent_response values are empty, you should respoind with a friendly message to the user and ask them to provide more information.
                         <state>
                         {state}
                         </state>

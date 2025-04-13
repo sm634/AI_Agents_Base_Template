@@ -10,11 +10,11 @@ if __name__ == "__main__":
     
     print("Graph has been built and saved as graph_output.png")
 
-    result = graph.invoke({
-            "user_input": "What is the status, description and priority of work order number 5012?"
-        },
-    )
-    print("Final state:")
-    print(result)
-    
+    for step in graph.stream(
+            {
+                "user_input": "What is the status, description and priority of work order number 5012?"
+            },
+        ):
+        print(step)
+
     breakpoint()
