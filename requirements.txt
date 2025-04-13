@@ -1,8 +1,10 @@
 langchain 
 langchain_ibm 
 langchain_core
-langchain_community 
+langchain_community
+langchain_experimental
 IPython 
 nasapy
 langgraph
+langgraph-supervisor
 streamlit
