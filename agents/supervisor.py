@@ -72,6 +72,12 @@ class SupervisorAgent(BaseAgent):
                                                 Your job is to evaluate if the response is suitably relevant to the user input or query.
                                                 If the response has relevant answers to the query, ensure it is expressed in a very friendly style to be provided to the human user.
                                                 If the response is not relevant to the user input, provide the answer in a friendly style to the user, and if there are some pieces of information in the query from the user that could help in answering the query. Gently nudge them to provide it.
+                                                Do not provide your reasoning or any other information outside of the main response.
+                                                Use the examples below to help you.
+                                                <example>
+                                                user_input: How many work orders have been reported damaged over the past three days in site Bedford?
+                                                response: The number of assets reported damaged over the past three days in site Bedford is 5.
+                                                </example>
                                                 response_to_evaluate: {response}
                                                 evaluation:""")
 
