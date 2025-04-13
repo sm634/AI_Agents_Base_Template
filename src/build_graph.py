@@ -2,7 +2,7 @@ from langgraph.graph import StateGraph
 
 from agents.base_agent import AgentState
 from agents.supervisor import  SupervisorAgent
-from agents.custom_agents import VectorDBAgent, MaximoAgent
+from agents.maximo_agent import VectorDBAgent, MaximoAgent
 
 
 # ----- Build LangGraph -----
@@ -12,12 +12,8 @@ def build_graph():
     supervisor = SupervisorAgent()
     maximo = MaximoAgent()
 
-    graph.add_node("router", supervisor.supervisor_router)
-
-    graph.add_node("maximo_payload_generator", maximo.generate_maximo_payload)
-    graph.add_node("maximo_request", maximo.perform_maximo_operation)
-
-    graph.add_node("supervisor_evaluation", supervisor.supervisor_evaluation)
+    graph.add_node("supervisor", supervisor.handle_input)
+    graph.add_node("maximo_agent", maximo.handle_input)
 
     graph.add_edge("router", "maximo_payload_generator")
     graph.add_edge("maximo_payload_generator", "maximo_request")

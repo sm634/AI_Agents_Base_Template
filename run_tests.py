@@ -5,7 +5,7 @@ from tests.test_llms import (
     test_generate_maximo_payload, 
     test_maximo_tool_use, 
     test_get_maximo_wo_details,
-    test_maximo_supervisor_response
+    test_supervisor_response
 )
 from dotenv import load_dotenv
 _ = load_dotenv()
@@ -16,7 +16,7 @@ FUNCTION_MAP = {
     "test_generate_maximo_payload": test_generate_maximo_payload,
     "test_maximo_tool_use": test_maximo_tool_use,
     "test_get_maximo_wo_details": test_get_maximo_wo_details,
-    "test_maximo_supervisor_response": test_maximo_supervisor_response,
+    "test_supervisor_response": test_supervisor_response,
     "test_update_maximo_data": test_update_maximo_data
 }
 
@@ -32,12 +32,15 @@ args = parser.parse_args()
 if args.function:
     test_function = FUNCTION_MAP[args.function]
     data = test_function()
+    print(data)
 else:
     # If no test name is provided, run all tests
     test_get_maximo_data()
     test_generate_maximo_payload()
     test_maximo_tool_use()
     test_get_maximo_wo_details()
-    test_maximo_supervisor_response()
+    test_supervisor_response()
     test_update_maximo_data()
     print("All tests executed successfully.")
+
+breakpoint()

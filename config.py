@@ -37,6 +37,17 @@ class Config:
         },
         "model_id": "meta-llama/llama-4-maverick-17b-128e-instruct-fp8"
     }
+    supervisor_params = {
+        "model_parameters": {
+            "decoding_method": "greedy",
+            "max_new_tokens": 1000,
+            "min_new_tokens": 1,
+            "temperature": 0.0,
+            "top_k": 50,
+            "top_p": 1,
+        },
+        "model_id": "mistralai/mistral-large"
+    }
     maximo_payload_generator_params = {
         "model_parameters": {
             "decoding_method": "greedy",
@@ -57,5 +68,5 @@ class Config:
             "top_k": 50,
             "top_p": 1,
         },
-        "model_id": "ibm/granite-3-8b-instruct"
+        "model_id": "mistralai/mistral-large"
     }

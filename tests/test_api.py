@@ -10,12 +10,12 @@ def test_get_maximo_data():
         }
     params = {'oslc.where': 'reportdate="1998-12-31T09:00:00+00:00"', 'oslc.select': 'description,wopriority,wonum', 'lean': '1', 'ignorecollectionref': '1'}
     params = {'oslc.where': 'wonum=5000', 'oslc.select': '*', 'lean': '1', 'ignorecollectionref': '1'}
-    params= {
-		"oslc.where": "reportdate>=\"1998-12-31T09:00:00\" and reportdate<=\"1998-12-31T17:00:00\"",
-		"oslc.select": "wonum,description,reportdate",
-		"lean": "1",
-		"ignorecollectionref": "1"
-	}
+    # params= {
+	# 	"oslc.where": "reportdate>=\"1998-12-31T09:00:00\" and reportdate<=\"1998-12-31T17:00:00\"",
+	# 	"oslc.select": "wonum,description,reportdate",
+	# 	"lean": "1",
+	# 	"ignorecollectionref": "1"
+	# }
     data = connector.get_workorder_details(params)
     print(data)
     breakpoint()

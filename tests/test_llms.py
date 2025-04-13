@@ -1,6 +1,6 @@
 from agents.base_agent import AgentState
 from agents.supervisor import SupervisorAgent
-from agents.custom_agents import MaximoAgent
+from agents.maximo_agent import MaximoAgent
 
 
 def test_supervisor_classification():
@@ -55,34 +55,16 @@ def test_maximo_tool_use():
     state = AgentState(user_input=user_input)
 
     # simulate the payload generation step.
-    state = maximo_agent.generate_maximo_payload(state=state)
-    print(state.maximo_payload, "\n\n")
-
-    # Simulate the classification step
-    state.supervisor_decision = "maximo"
-
-    # Perform the Maximo operation
-    response = maximo_agent.perform_maximo_operation(state=state)
+    response = maximo_agent.handle_input(state=state)
     return response, state
 
-def test_maximo_supervisor_response():
-    maximo_agent = MaximoAgent()
+def test_supervisor_response():
+    supervisor = SupervisorAgent()
     user_input = "What is the status, description and priority of work order number 5012?"
     # user_input = "Update the work order 5012 to priority 1."
-    print(user_input)
     state = AgentState(user_input=user_input)
 
-    # simulate the payload generation step.
-    state = maximo_agent.generate_maximo_payload(state=state)
-
-    # Simulate the classification step
-    state.supervisor_decision = "maximo"
-
-    # Perform the Maximo operation
-    state = maximo_agent.perform_maximo_operation(state=state)
-    print("fetched data from maximo: ", state.maximo_agent_response)
-    # Perform the evaluation step
-    supervisor = SupervisorAgent()
-    evaluation_result = supervisor.supervisor_evaluation(state=state)
-    print(evaluation_result)
-    return evaluation_result, state
+    # simulate the supervisor response.
+    supervisor_response = supervisor.handle_input(state=state)
+    
+    return supervisor_response

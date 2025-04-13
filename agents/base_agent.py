@@ -7,8 +7,7 @@ In this framework or design what determines or separates each agent are the foll
 """
 
 
-from typing import Dict, Any, Optional, List, Annotated, TypedDict
-from pydantic import BaseModel
+from typing import Dict, Any, Optional, List, Annotated, TypedDict, Union
 from config import Config
 from langchain_core.messages import SystemMessage, HumanMessage
 import operator
@@ -17,9 +16,10 @@ import operator
 class AgentState(TypedDict):
     user_input: str
     supervisor_decision: Optional[str] = None
-    maximo_payload: Optional[str] = None
+    maximo_payload: Optional[Union[Dict, str]] = None
+    tool_calls: Optional[List[Any]] = []
     maximo_agent_response: Optional[str] = None
-    vector_search_result: Optional[str] = None
+    milvus_agent_response: Optional[str] = None
     final_response: Optional[str] = None
     memory_chain: Annotated[List[Dict[str, Any]], operator.add] = []
 
