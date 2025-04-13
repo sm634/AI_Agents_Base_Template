@@ -9,18 +9,46 @@ st.title("BPD Agent")
 st.sidebar.image('images/BPD logo.png', use_container_width=True)
 st.subheader("Agent to Assist you with Maximo Work Orders")
 
-# with col1:
+import streamlit as st
+
+# Initialize session state to store chat history
+if "chat_history" not in st.session_state:
+    st.session_state.chat_history = []
+
+# User input
 query = st.text_input("Type your query here")
-if st.button("Ask") and query is not None:
-    st.write(query)
+
+col1, col2 = st.columns([1, 5])
+# When query is submitted (Enter pressed)
+if query:
+    with col2:
+        st.markdown(
+            f"<div style='text-align: right; font-style: italic;'>{query}</div>",
+            unsafe_allow_html=True,
+        )
+    # Generate response (can still show spinner)
     with st.spinner("Generating response..."):
         result = graph.invoke({
-                "user_input": query
-            },
-        )
-    
-    st.write(result['memory_chain'][-1]['final_response'])
+            "user_input": query
+        })
 
-    expander_msg = f"Show Full Model Process"
-    with st.expander(expander_msg):
-        st.write(result)
+    response = result['memory_chain'][-1]['final_response']
+
+    st.markdown("\n")
+
+    col3, col4 = st.columns([5, 1])
+    with col3:
+        st.markdown(
+            f"<div style='text-align: left; font-style: italic;'>{response}</div>",
+            unsafe_allow_html=True,
+        )
+
+    with st.expander("\n\nShow Full Model Process", expanded=False):
+        st.write(result['memory_chain'])
+
+    # Save query and response to session_state
+    st.session_state.chat_history.append({
+        "query": query,
+        "response": response,
+        "raw": result['memory_chain']
+    })
