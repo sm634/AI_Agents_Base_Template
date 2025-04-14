@@ -32,7 +32,7 @@ if query:
             "user_input": query
         })
 
-    response = result['memory_chain'][-1]['final_response']
+    response = result['final_response']
 
     st.markdown("\n")
 
@@ -43,7 +43,8 @@ if query:
             unsafe_allow_html=True,
         )
 
-    with st.expander("\n\nShow Full Model Process", expanded=False):
+    with st.expander("Show Full Model Process", expanded=False):
+        st.write("\n\n")
         st.write(result['memory_chain'])
 
     # Save query and response to session_state

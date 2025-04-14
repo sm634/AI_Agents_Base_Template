@@ -1,110 +1,57 @@
-from connectors.maximo_connector import MaximoConnector
+import os
+from langchain_community.document_loaders import PyPDFLoader
+from langchain.text_splitter import RecursiveCharacterTextSplitter
+from langchain_huggingface import HuggingFaceEmbeddings
+from langchain_chroma import Chroma
 
-from pydantic import BaseModel, Field
-from typing import Dict, Union, Any
-from langchain.agents import tool
-import ast
-from langchain_core.messages import HumanMessage, SystemMessage
+# Set the path to your PDF file
+pdf_path = "data/ventilation_doc.pdf"
 
-# instantiate maximo connector.
-maximo_connector = MaximoConnector()
+# Load the PDF document
+loader = PyPDFLoader(pdf_path)
+documents = loader.load()
 
+# Split the document into chunks
+text_splitter = RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=50)
+docs = text_splitter.split_documents(documents)
 
-class MaximoAgentTools:
+# Initialize the embedding model
+embedding_function = HuggingFaceEmbeddings(model_name="ibm-granite/granite-embedding-30m-english")
 
-    class MaiximoPayloadInput(BaseModel):
-        maximo_payload: Union[Dict, str] = Field(description="The payload to be sent to Maximo.")
+# Set the directory for persistence
+persist_directory = "./chroma_db"
 
-    @tool(args_schema=MaiximoPayloadInput)
-    def perform_maximo_operation(maximo_payload: Union[Dict, str]):
-        """
-        Perform maximo operation for API requests.
-        :param state: The state of the agent containing the user input and states to be updated.
-        :return: A dictionary containing the Maximo payload.
-        """
-        # Check to see the maximo payload returned, and the response type to perform the correct action.
-        if isinstance(maximo_payload, str):
-            maximo_payload = ast.literal_eval(maximo_payload)
+# Create the Chroma vector store
+vectordb = Chroma(
+    collection_name="pdf_collection",
+    embedding_function=embedding_function,
+    persist_directory=persist_directory
+)
 
-        request_type = maximo_payload.get("request_type")
-        params = maximo_payload.get("params")
-
-        if request_type.lower() == 'get':
-            result = maximo_connector.get_workorder_details(params)
-        elif request_type.lower() == 'post':
-            result = maximo_connector.post_workorder_details(params)
-        else:
-            result = {
-                "message": "This query is not related to Maximo."
-            }
-
-        return {
-            "maximo_agent_response": result
-        }
-    
-
-    class MaximoPayloadGeneratorInput(BaseModel):
-        user_input: str = Field(description="Thing to search for")
-        system_prompt: SystemMessage = Field(description="System prompt to use for generating the payload")
-        llm: Any = Field(description="LLM to use for generating the payload")
+# Add documents to the vector store
+vectordb.add_documents(docs)
 
 
-    @tool(args_schema=MaximoPayloadGeneratorInput)
-    def generate_maximo_payload(user_input, system_prompt, llm) -> Dict[str, Any]:
-        """
-        Generates the Maximo payload based on the user input.
-        :param state: The state of the agent containing the user input and to be updated.
-        :return: A dictionary containing the Maximo payload.
-        """
-        # Check if the user input is classified as a Maximo operation
-        user_input = HumanMessage(
-            content=user_input
-        )
-        messages = [
-            system_prompt,
-            user_input,
-        ]
+print(f"Successfully ingested {len(docs)} chunks into Chroma at '{persist_directory}'.")
 
-        response = llm.invoke(messages)
+# breakpoint()
 
-        # validate do a dict.
-        maximo_payload = ast.literal_eval(response.content)
+# Load the persisted Chroma vector store
+vectordb = Chroma(
+    persist_directory=persist_directory,
+    embedding_function=embedding_function
+)
 
-        return maximo_payload
+# Define your search query
+query = "What are some issues with noise on a ventilation system?"
 
+# Perform a similarity search
+results = vectordb.similarity_search(query, k=4)
 
-class MaiximoPayloadInput(BaseModel):
-    maximo_payload: Union[Dict, str] = Field(description="The payload to be sent to Maximo.")
-
-@tool(args_schema=MaiximoPayloadInput)
-def perform_maximo_operation(maximo_payload: Union[Dict, str]):
-    """
-    Perform maximo operation for API requests.
-    :param state: The state of the agent containing the user input and states to be updated.
-    :return: A dictionary containing the Maximo payload.
-    """
-    # Check to see the maximo payload returned, and the response type to perform the correct action.
-    if isinstance(maximo_payload, str):
-        maximo_payload = ast.literal_eval(maximo_payload)
-
-    request_type = maximo_payload.get("request_type")
-    params = maximo_payload.get("params")
-
-    if request_type.lower() == 'get':
-        result = maximo_connector.get_workorder_details(params)
-    elif request_type.lower() == 'post':
-        result = maximo_connector.post_workorder_details(params)
-    else:
-        result = {
-            "message": "This query is not related to Maximo."
-        }
-
-    return {
-        "maximo_agent_response": result
-    }
-
-
-print(type(MaximoAgentTools.perform_maximo_operation))
-print(type(perform_maximo_operation))
+# Display the search results
+for idx, doc in enumerate(results, start=1):
+    print(f"Result {idx}:")
+    print(doc.page_content)
+    print("-" * 80)
 
 breakpoint()

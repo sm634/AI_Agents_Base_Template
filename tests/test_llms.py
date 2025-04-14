@@ -1,6 +1,7 @@
 from agents.base_agent import AgentState
 from agents.supervisor import SupervisorAgent
 from agents.maximo_agent import MaximoAgent
+from agents.vector_db_agent import ChromaAgent
 
 
 def test_supervisor_classification():
@@ -58,8 +59,8 @@ def test_maximo_tool_use():
     response = maximo_agent.handle_input(state=state)
     print("STATE: ",state, "\n\n")
     print("RESPONSE: ", response, "\n\n", "*"*30)
-
-    while response['maximo_agent_response'] == 'maximo_tools':
+    breakpoint()
+    while len(state['maximo_agent_response']) < 1:
         # simulate the tool use step.
         response = maximo_agent.handle_input(state=state)
         response = maximo_agent.use_maximo_tools(state=state)
@@ -91,3 +92,40 @@ def test_supervisor_response():
     print(supervisor_response, "\n\n")
 
     return supervisor_response
+
+
+def test_full_maximo_run():
+
+    user_input="How many priority 1 are there for work orders in december 31, 1998? "
+    state = AgentState(user_input=user_input)
+    supervisor = SupervisorAgent()
+    state = supervisor.handle_input(state=state)
+
+    maximo_agent = MaximoAgent()
+    state.setdefault('maximo_agent_response', '')
+    while len(state['maximo_agent_response']) < 1:
+        # simulate the tool use step.
+        response = maximo_agent.handle_input(state=state)
+        print("STATE: ", state,"\n", "*"*30)
+
+    state = supervisor.handle_input(state=state)
+
+    return state
+
+def test_full_vector_db_run():
+
+    user_input="What are some issues with noise on a ventilation system?"
+    state = AgentState(user_input=user_input)
+    supervisor = SupervisorAgent()
+    state = supervisor.handle_input(state=state)
+
+    vector_db_agent = ChromaAgent()
+    state.setdefault(state['vector_db_agent_response'], '')
+   
+    # simulate the tool use ste.
+    response = vector_db_agent.handle_input(state=state)
+    print("STATE: ", state, "\n", "*"*30)
+
+    state = supervisor.handle_input(state=state)
+
+    return state

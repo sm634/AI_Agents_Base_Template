@@ -70,10 +70,10 @@ class Config:
         },
         "model_id": "mistralai/mistral-large"
     }
-    milvus_agent_params = {
+    vector_db_agent_params = {
         "model_parameters": {
             "decoding_method": "greedy",
-            "max_new_tokens": 500,
+            "max_new_tokens": 3000,
             "min_new_tokens": 1,
             "temperature": 0.0,
             "top_k": 50,

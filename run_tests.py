@@ -5,7 +5,9 @@ from tests.test_llms import (
     test_generate_maximo_payload, 
     test_maximo_tool_use, 
     test_get_maximo_wo_details,
-    test_supervisor_response
+    test_supervisor_response,
+    test_full_maximo_run,
+    test_full_vector_db_run
 )
 from dotenv import load_dotenv
 _ = load_dotenv()
@@ -17,7 +19,9 @@ FUNCTION_MAP = {
     "test_maximo_tool_use": test_maximo_tool_use,
     "test_get_maximo_wo_details": test_get_maximo_wo_details,
     "test_supervisor_response": test_supervisor_response,
-    "test_update_maximo_data": test_update_maximo_data
+    "test_update_maximo_data": test_update_maximo_data,
+    "test_full_maximo_run": test_full_maximo_run,
+    "test_full_vector_db_run": test_full_vector_db_run
 }
 
 # Parse command line arguments
@@ -41,6 +45,7 @@ else:
     test_get_maximo_wo_details()
     test_supervisor_response()
     test_update_maximo_data()
+    test_full_maximo_run()
     print("All tests executed successfully.")
 
 breakpoint()

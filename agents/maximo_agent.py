@@ -48,91 +48,85 @@ class MaximoAgent(BaseAgent):
         """
         Takes action based on the state of the agent.
         :param state: The state of the agent containing the user input and states to be updated.
-        :return: A dictionary containing the action taken.
+        :return: updated state for the agent.
         """
-        # instantiate the prompt with the state.
-        system_message = MaximoAgentPrompts.maximo_agent_prompt.format(state=state)
-        message = [
-            SystemMessage(content=system_message),
-            HumanMessage(content=f"{state['user_input']}")
-        ]
 
-        # call the llm with the message.
-        agent_response = self.llm_with_tools.invoke(message)
-        # print("AGENT RESPONSE: ", agent_response, "\n\n", "*"*30)
-        print("AGENT_RESPONSE", agent_response, "\n\n", "*"*30)
-        # update the state with the agent response
-        if agent_response.tool_calls is None or len(agent_response.tool_calls) < 1:
-            state['tool_calls'] = ''
-        else:
-            state['tool_calls'] = agent_response.tool_calls[0]['name']
-            state.setdefault('memory_chain', []).append({
-                'tool_calls': state['tool_calls'],
-            })
+        # use the tools to get the results and responses before getting back to the supervisor.
+        while (len(state['maximo_payload']) and len(state['maximo_agent_response'])) < 1:
 
-            if 'maximo_payload' and 'maximo_agent_response' not in state:
-                return {
-                    "maximo_agent_response": "maximo_tools"
-                }
+            # instantiate the prompt with the state. Each loop should update the state.
+            system_message = MaximoAgentPrompts.maximo_agent_prompt.format(state=state)
+            message = [
+                SystemMessage(content=system_message),
+                HumanMessage(content=f"{state['user_input']}")
+            ]
+            # call the llm with the message.
+            agent_response = self.llm_with_tools.invoke(message)
+            
+            # update the state with the agent response
+            state.setdefault('tool_calls','')
+            if hasattr(agent_response, 'tool_calls'): 
+                state['tool_calls'] = agent_response.tool_calls[0]['name']
+                state = self.use_maximo_tools(state=state)
             else:
-                return {
-                    "maximo_agent_response": "supervisor"
-                }
+                break
+
+        return {'maximo_payload': state['maximo_payload'],
+                'maximo_agent_response': state['maximo_agent_response']}
+
 
     def use_maximo_tools(self, state: AgentState):
         # Check if the user input is classified as a Maximo operation
-            selected_tool = state['tool_calls'] 
-            print(f"Calling: {selected_tool}")
-            # invoke the tools and update the states depending on each tool use.
-            if selected_tool == "perform_maximo_operation":
-                # set the input parameters or arguments for the tool.
-                tool_input = {
-                    "maximo_payload": state['maximo_payload'],
-                    }
-
-                # invoke the tool and get the result.
-                maximo_agent_response = self.tools_dict[selected_tool].invoke(tool_input)
-
-                # update the state with the tool result.
-                state['maximo_agent_response'] = maximo_agent_response
-                state['memory_chain'].append({
-                    'maximo_agent_response': state['maximo_agent_response'],
-                })
-
-                return {
-                    "maximo_agent_response": "maximo_agent"
-                    }
-
-            elif selected_tool == "generate_maximo_payload":
-                # set the input parameters or arguments for the tool.
-                tool_input = {
-                    "user_input": state['user_input'],
-                    "system_prompt": self.payload_generator_system_message,
-                    "llm": self.payload_generator_llm
+        selected_tool = state['tool_calls'] 
+        print(f"Calling: {selected_tool}")
+        # invoke the tools and update the states depending on each tool use.
+        if selected_tool == "perform_maximo_operation":
+            # set the input parameters or arguments for the tool.
+            tool_input = {
+                "maximo_payload": state['maximo_payload'],
                 }
-                # invoke the tool and get the result.
-                maximo_payload = self.tools_dict[selected_tool].invoke(tool_input)
-                # update the state with the tool result.
-                state['maximo_payload'] = maximo_payload
-                state['memory_chain'].append({
-                    'maximo_payload': state['maximo_payload'],
-                })
-                
-                return {
-                    "maximo_agent_response": "maximo_tools"
-                    }
 
-    # @staticmethod
-    # def router(state: AgentState):
-    #     """
-    #     Routes the user input to the appropriate Maximo operation.
-    #     :param state: The state of the agent containing the user input and states to be updated.
-    #     :return: A dictionary containing the action taken.
-    #     """
-    #     if state['maximo_payload'] is None and state['maximo_agent_response'] is None:
-    #         next = "maximo_agent"
-    #     elif state['maximo_agent_response'] is not None:
-    #         next = "supervisor"
-    #     return {
-    #         "next": next
-    #     }
+            # invoke the tool and get the result.
+            maximo_agent_response = self.tools_dict[selected_tool].invoke(tool_input)
+
+            # update the state with the tool result.
+            state['maximo_agent_response'] = maximo_agent_response
+            state['memory_chain'].append({
+                'maximo_agent_response': state['maximo_agent_response'],
+            })
+
+            return state
+
+        elif selected_tool == "generate_maximo_payload":
+            # set the input parameters or arguments for the tool.
+
+            tool_input = {
+                "user_input": state['user_input'],
+                "system_prompt": self.payload_generator_system_message,
+                "llm": self.payload_generator_llm
+            }
+
+            # invoke the tool and get the result.
+            maximo_payload = self.tools_dict[selected_tool].invoke(tool_input)
+            # update the state with the tool result.
+            state['maximo_payload'] = maximo_payload
+            state.setdefault('memory_chain',[]).append({
+                'maximo_payload': state['maximo_payload'],
+            })
+
+            return state
+
+    @staticmethod
+    def router(state: AgentState):
+        """
+        Routes the user input to the appropriate Maximo operation.
+        :param state: The state of the agent containing the user input and states to be updated.
+        :return: A dictionary containing the action taken.
+        """
+
+        if (len(state['maximo_payload']) and len(state['maximo_agent_response'])) < 1:
+            state['memory_chain'].append({'tool_calls': state['tool_calls']})
+            return "maximo_tools"
+        else:
+            return "supervisor"
+        

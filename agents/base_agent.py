@@ -7,21 +7,21 @@ In this framework or design what determines or separates each agent are the foll
 """
 
 
-from typing import Dict, Any, Optional, List, Annotated, TypedDict, Union
+from typing import Dict, Any, Optional, List, TypedDict
 from config import Config
 from langchain_core.messages import SystemMessage, HumanMessage
-import operator
+
 
 # ----- Shared State Schema -----
 class AgentState(TypedDict):
     user_input: str
     supervisor_decision: Optional[str] = None
-    maximo_payload: Optional[Union[Dict, str]] = None
+    maximo_payload: Optional[str] = None
     tool_calls: Optional[str] = None
     maximo_agent_response: Optional[str] = None
-    milvus_agent_response: Optional[str] = None
+    vector_db_agent_response: Optional[str] = None
     final_response: Optional[str] = None
-    memory_chain: Annotated[List[Dict[str, Any]], operator.add] = []
+    memory_chain: List[Dict[str, Any]] = []
 
 
 class BaseAgent:
@@ -48,4 +48,4 @@ class BaseAgent:
         return self.handle_input(state)
 
     def handle_input(self, state: Dict[str, Any]) -> Dict[str, Any]:
-        raise NotImplementedError
+        return state

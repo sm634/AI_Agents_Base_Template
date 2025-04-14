@@ -10,9 +10,13 @@ if __name__ == "__main__":
     
     print("Graph has been built and saved as graph_output.png")
 
+    # for vectordb test
+    user_input="What are some issues with noise on a ventilation system?"
+    # for maximo test
+    # user_input = "What is the status, description and priority of work order number 5012?"
     result = graph.invoke(
             {
-                "user_input": "What is the status, description and priority of work order number 5012?"
+                "user_input": user_input
             },
         )
     print(result)

@@ -29,10 +29,12 @@ class MaximoConnector():
         response = requests.get(self.url_get, headers=headers, params=params)
         if response.status_code == 200:
             payload = response.json()
-            data = payload['member']
-            return data
+            try:
+                return payload['member']
+            except KeyError:
+                return payload
         else:
-            print(f"Error: {response}")
+            return f"Error: {response}"
 
 
     def post_workorder_details(self, params: Dict) -> Dict:

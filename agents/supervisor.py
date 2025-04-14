@@ -8,11 +8,10 @@ import os
 from config import Config
 from agents.base_agent import BaseAgent, AgentState
 from prompt_reference.supervisor_prompt import SupervisorPrompts
-from tools.supervisor_tools import SupervisorTools
 from utils.handle_configs import get_llm
 # third party libraries
 from langchain_core.messages import HumanMessage, SystemMessage
-from langchain_ibm import ChatWatsonx
+from langgraph.graph import END
 
 
 
@@ -30,18 +29,23 @@ class SupervisorAgent(BaseAgent):
     
 
     def handle_input(self, state: AgentState):
+
         """To be implemented"""
         # instantiate the prompt with the state.
         user_input = state['user_input']
-        if 'maximo_agent_response' not in state:
-            state['maximo_agent_response'] = ''
-        if 'milvus_agent_response' not in state:
-            state['milvus_agent_response'] = ''
-        else:
-            state['milvus_agent_response'] = state['milvus_agent_response']
-            state['maximo_agent_response'] = state['maximo_agent_response']
         
-        agent_response = state['maximo_agent_response'] + '\n' + state['milvus_agent_response']
+        # initialize the states if it does not already contain a value to be updated later.
+        if 'maximo_payload' not in state:
+            state.setdefault('maximo_payload', '')
+        if 'maximo_agent_response' not in state:
+            state.setdefault('maximo_agent_response', '')
+        if 'vector_db_agent_response' not in state:
+            state.setdefault('vector_db_agent_response', '')
+        if 'tool_calls' not in state:
+            state.setdefault('tool_calls', '')
+
+
+        agent_response = str(state['maximo_agent_response']) + '\n' + str(state['vector_db_agent_response'])
 
         system_message = SupervisorPrompts.supervisor_prompt.format(
             user_input=user_input,
@@ -57,29 +61,31 @@ class SupervisorAgent(BaseAgent):
         supervisor_response = self.llm.invoke(message).content
 
         # update the state with the supervisor response.
-        state['supervisor_decision'] = supervisor_response
-        state.setdefault('memory_chain',[]).append(
-            {
-                'supervisor_decision': state['supervisor_decision']
-            }
-        )
-        if supervisor_response in ['maximo', 'milvus', 'unknown']:
-            return {
-                 "supervisor_decision": supervisor_response
-            }
+        state.setdefault('memory_chain', []).append({'supervisor_response': supervisor_response})
+
+        routing_options = ['maximo', 'vector_db', 'unknown']
+        if supervisor_response in routing_options:
+            state.setdefault('supervisor_decision', '')
+            state['supervisor_decision'] = supervisor_response
+
         else:
+            state.setdefault('final_response', '')
             state['final_response'] = supervisor_response
-            return {
-                "final_response": state['final_response']
-            }
+
+        return state
+
         
     @staticmethod
     def router(state: AgentState):
-        print("Routing to the ")
-        if "maximo" in state['supervisor_decision']:
-            return {"maximo_agent": "maximo_agent"}
-        elif "milvus" in state['supervisor_decision']:
-            return "milvus_agent"
-        else:
-            return "supervisor"
+
+        decision = state.get('supervisor_decision', '')
+
+        if 'final_response' in state:
+            return END
+        if "maximo" in decision:
+            return "maximo"
+        elif "vector_db" in decision:
+            return "vector_db"
+        elif 'unknown' in decision:
+            return "unknown"
         
