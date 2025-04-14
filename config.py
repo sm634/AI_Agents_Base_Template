@@ -46,7 +46,7 @@ class Config:
             "top_k": 50,
             "top_p": 1,
         },
-        "model_id": "mistralai/mistral-large"
+        "model_id": "meta-llama/llama-4-maverick-17b-128e-instruct-fp8"
     }
     maximo_payload_generator_params = {
         "model_parameters": {

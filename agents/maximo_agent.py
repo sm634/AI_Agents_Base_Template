@@ -7,6 +7,7 @@ from tools.maximo_agent_tools import MaximoAgentTools
 from utils.handle_configs import get_llm
 
 from langchain_core.messages import HumanMessage, SystemMessage
+from langgraph.graph import END
 
 from config import Config
 
@@ -49,25 +50,39 @@ class MaximoAgent(BaseAgent):
         :param state: The state of the agent containing the user input and states to be updated.
         :return: A dictionary containing the action taken.
         """
+        # instantiate the prompt with the state.
         system_message = MaximoAgentPrompts.maximo_agent_prompt.format(state=state)
         message = [
             SystemMessage(content=system_message),
             HumanMessage(content=f"{state['user_input']}")
         ]
-        
+
         # call the llm with the message.
         agent_response = self.llm_with_tools.invoke(message)
-
+        # print("AGENT RESPONSE: ", agent_response, "\n\n", "*"*30)
+        print("AGENT_RESPONSE", agent_response, "\n\n", "*"*30)
         # update the state with the agent response
-        state.setdefault('tool_calls', []).append(agent_response.tool_calls)
-        state.setdefault('memory_chain', []).append({
-            'tool_calls': state['tool_calls'],
-        })
+        if agent_response.tool_calls is None or len(agent_response.tool_calls) < 1:
+            state['tool_calls'] = ''
+        else:
+            state['tool_calls'] = agent_response.tool_calls[0]['name']
+            state.setdefault('memory_chain', []).append({
+                'tool_calls': state['tool_calls'],
+            })
 
+            if 'maximo_payload' and 'maximo_agent_response' not in state:
+                return {
+                    "maximo_agent_response": "maximo_tools"
+                }
+            else:
+                return {
+                    "maximo_agent_response": "supervisor"
+                }
+
+    def use_maximo_tools(self, state: AgentState):
         # Check if the user input is classified as a Maximo operation
-        for tool_call in agent_response.tool_calls:
-            selected_tool = tool_call['name'] 
-            print(f"Calling: {tool_call['name']}")
+            selected_tool = state['tool_calls'] 
+            print(f"Calling: {selected_tool}")
             # invoke the tools and update the states depending on each tool use.
             if selected_tool == "perform_maximo_operation":
                 # set the input parameters or arguments for the tool.
@@ -77,15 +92,15 @@ class MaximoAgent(BaseAgent):
 
                 # invoke the tool and get the result.
                 maximo_agent_response = self.tools_dict[selected_tool].invoke(tool_input)
+
                 # update the state with the tool result.
                 state['maximo_agent_response'] = maximo_agent_response
                 state['memory_chain'].append({
-                    'maximo_agent_response': agent_response,
+                    'maximo_agent_response': state['maximo_agent_response'],
                 })
 
                 return {
-                    "maximo_agent_response": maximo_agent_response,
-                    "next": "supervisor",
+                    "maximo_agent_response": "maximo_agent"
                     }
 
             elif selected_tool == "generate_maximo_payload":
@@ -104,21 +119,20 @@ class MaximoAgent(BaseAgent):
                 })
                 
                 return {
-                    "maximo_payload": maximo_payload,
-                    "next": "maximo_agent"
+                    "maximo_agent_response": "maximo_tools"
                     }
 
-    @staticmethod
-    def router(state: AgentState):
-        """
-        Routes the user input to the appropriate Maximo operation.
-        :param state: The state of the agent containing the user input and states to be updated.
-        :return: A dictionary containing the action taken.
-        """
-        if state['maximo_payload'] is None and state['maximo_agent_response'] is None:
-            next = "maximo_agent"
-        elif state['maximo_agent_response'] is not None:
-            next = "supervisor"
-        return {
-            "next": next
-        }
+    # @staticmethod
+    # def router(state: AgentState):
+    #     """
+    #     Routes the user input to the appropriate Maximo operation.
+    #     :param state: The state of the agent containing the user input and states to be updated.
+    #     :return: A dictionary containing the action taken.
+    #     """
+    #     if state['maximo_payload'] is None and state['maximo_agent_response'] is None:
+    #         next = "maximo_agent"
+    #     elif state['maximo_agent_response'] is not None:
+    #         next = "supervisor"
+    #     return {
+    #         "next": next
+    #     }

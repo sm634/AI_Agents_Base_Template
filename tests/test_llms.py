@@ -56,6 +56,19 @@ def test_maximo_tool_use():
 
     # simulate the payload generation step.
     response = maximo_agent.handle_input(state=state)
+    print("STATE: ",state, "\n\n")
+    print("RESPONSE: ", response, "\n\n", "*"*30)
+
+    while response['maximo_agent_response'] == 'maximo_tools':
+        # simulate the tool use step.
+        response = maximo_agent.handle_input(state=state)
+        response = maximo_agent.use_maximo_tools(state=state)
+        print("STATE: ",state, "\n\n")
+        print("RESPONSE: ", response, "\n\n", "*"*30)
+
+    # simulate the supervisor step.
+    response = maximo_agent.handle_input(state=state)
+    
     return response, state
 
 def test_supervisor_response():
@@ -64,7 +77,17 @@ def test_supervisor_response():
     # user_input = "Update the work order 5012 to priority 1."
     state = AgentState(user_input=user_input)
 
-    # simulate the supervisor response.
+    # simulate the routing step.
     supervisor_response = supervisor.handle_input(state=state)
-    
+    print(state, "\n\n")
+    print(supervisor_response, "\n\n")
+
+    # simulate the evaluation step.
+    agent_response = """[{{"wonum": "5012", "status": "COMPLETE", wopriority: 1, "description": "HVAC - cooling system", "wopriority": "1"}}]"""
+    state['maximo_agent_response'] = agent_response
+
+    supervisor_response = supervisor.handle_input(state=state)
+    print(state, "\n\n")
+    print(supervisor_response, "\n\n")
+
     return supervisor_response

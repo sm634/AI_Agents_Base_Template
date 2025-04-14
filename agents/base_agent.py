@@ -17,7 +17,7 @@ class AgentState(TypedDict):
     user_input: str
     supervisor_decision: Optional[str] = None
     maximo_payload: Optional[Union[Dict, str]] = None
-    tool_calls: Optional[List[Any]] = []
+    tool_calls: Optional[str] = None
     maximo_agent_response: Optional[str] = None
     milvus_agent_response: Optional[str] = None
     final_response: Optional[str] = None

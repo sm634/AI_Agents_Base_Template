@@ -97,9 +97,12 @@ class MaximoAgentPrompts:
         Then you will make the next decision based on the response from the tools.
 
         Use the state to keep track of the user input and the response from the tools.
+        <state> 
         {state}
+        </state>
         
         For example, if the state contains a value for maximo_payload, then you should call the perform_maximo_operator tool. If there is no payload, then you will need to use the
         generate_maximo_payload tool to generate the payload.
+        If the state contains booth maximo_payload and maximo_agent_response, then do not use tool calls and simply return 'finished'.
         Always use your best judgment to decide which tool to use and when to use it.
         """
