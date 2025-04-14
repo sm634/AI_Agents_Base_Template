@@ -89,7 +89,9 @@ class SupervisorAgent(BaseAgent):
 
                     assert tool_response in ["maximo", "vector_db", "unknown"], f"Invalid tool response: {tool_response}"
                     print(tool_response)
-                    return tool_response
+                    return {
+                        "supervisor_decision": tool_response
+                    }
 
                 elif selected_tool.name == "supervisor_evaluation":
                     # set up the system prompt template for the evaluation.
@@ -125,10 +127,15 @@ class SupervisorAgent(BaseAgent):
         
     @staticmethod
     def router(state: AgentState):
-        if state['supervisor_decision'] == "maximo":
-            return "maximo_agent"
-        elif state['supervisor_decision'] == "milvus":
-            return "milvus_agent"
+        print("Routing to the ")
+        next = ''
+        if "maximo" in state['supervisor_decision']:
+            next = "maximo_agent"
+        elif "milvus" in state['supervisor_decision']:
+            next = "milvus_agent"
         else:
-            return "supervisor"
+            next = "supervisor"
+        return {
+            "next": next
+        }
         

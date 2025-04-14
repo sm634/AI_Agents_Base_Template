@@ -107,3 +107,18 @@ class MaximoAgent(BaseAgent):
                     "maximo_payload": maximo_payload,
                     "next": "maximo_agent"
                     }
+
+    @staticmethod
+    def router(state: AgentState):
+        """
+        Routes the user input to the appropriate Maximo operation.
+        :param state: The state of the agent containing the user input and states to be updated.
+        :return: A dictionary containing the action taken.
+        """
+        if state['maximo_payload'] is None and state['maximo_agent_response'] is None:
+            next = "maximo_agent"
+        elif state['maximo_agent_response'] is not None:
+            next = "supervisor"
+        return {
+            "next": next
+        }
