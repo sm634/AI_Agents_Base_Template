@@ -16,6 +16,7 @@ def build_graph():
 
     # Add nodes to the graph
     graph.add_node("supervisor", supervisor.handle_input)
+    graph.add_node("supervisor_router", supervisor.router)
     graph.add_node("maximo_agent", maximo.handle_input)
     graph.add_node("milvus_agent", milvus.handle_input)
     

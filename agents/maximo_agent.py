@@ -78,12 +78,15 @@ class MaximoAgent(BaseAgent):
                 # invoke the tool and get the result.
                 maximo_agent_response = self.tools_dict[selected_tool].invoke(tool_input)
                 # update the state with the tool result.
-                state['maximo_agent_response'] = tool_result
+                state['maximo_agent_response'] = maximo_agent_response
                 state['memory_chain'].append({
                     'maximo_agent_response': agent_response,
                 })
 
-                return {"maximo_agent_response": maximo_agent_response}
+                return {
+                    "maximo_agent_response": maximo_agent_response,
+                    "next": "supervisor",
+                    }
 
             elif selected_tool == "generate_maximo_payload":
                 # set the input parameters or arguments for the tool.
@@ -99,5 +102,8 @@ class MaximoAgent(BaseAgent):
                 state['memory_chain'].append({
                     'maximo_payload': state['maximo_payload'],
                 })
-            
-                return {"maximo_payload": maximo_payload}
+                
+                return {
+                    "maximo_payload": maximo_payload,
+                    "next": "maximo_agent"
+                    }

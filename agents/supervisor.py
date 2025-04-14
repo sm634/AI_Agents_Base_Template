@@ -88,8 +88,8 @@ class SupervisorAgent(BaseAgent):
                     })
 
                     assert tool_response in ["maximo", "vector_db", "unknown"], f"Invalid tool response: {tool_response}"
-                    
-                    return {"supervisor_decision": tool_response}
+                    print(tool_response)
+                    return tool_response
 
                 elif selected_tool.name == "supervisor_evaluation":
                     # set up the system prompt template for the evaluation.
@@ -113,6 +113,7 @@ class SupervisorAgent(BaseAgent):
                     state['memory_chain'].append({
                         'final_response': tool_response
                     })        
+                    print(tool_response)
 
                     return {"final_response": final_response}
             
@@ -120,6 +121,14 @@ class SupervisorAgent(BaseAgent):
             state['maximo_agent_response'] = "unknown"
             state['milvus_agent_response'] = "unknown"
             # set up the system prompt template for the evaluation.
-        return {"final_response": "unknown"}
-            
+        return "Supervisor"
+        
+    @staticmethod
+    def router(state: AgentState):
+        if state['supervisor_decision'] == "maximo":
+            return "maximo_agent"
+        elif state['supervisor_decision'] == "milvus":
+            return "milvus_agent"
+        else:
+            return "supervisor"
         
