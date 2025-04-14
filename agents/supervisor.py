@@ -63,15 +63,11 @@ class SupervisorAgent(BaseAgent):
                 'supervisor_decision': state['supervisor_decision']
             }
         )
-
-        if state['supervisor_decision'] in ['maximo', 'milvus', 'unknown']:
+        if supervisor_response in ['maximo', 'milvus', 'unknown']:
             return {
-                "supervisor_decision": state['supervisor_decision']
+                 "supervisor_decision": supervisor_response
             }
         else:
-            if 'final_response' not in state:
-                state['final_response'] = ''
-
             state['final_response'] = supervisor_response
             return {
                 "final_response": state['final_response']
@@ -80,14 +76,10 @@ class SupervisorAgent(BaseAgent):
     @staticmethod
     def router(state: AgentState):
         print("Routing to the ")
-        next = ''
         if "maximo" in state['supervisor_decision']:
-            next = "maximo"
+            return {"maximo_agent": "maximo_agent"}
         elif "milvus" in state['supervisor_decision']:
-            next = "milvus"
+            return "milvus_agent"
         else:
-            next = "supervisor"
-        return {
-            "supervisor_decision": next
-        }
+            return "supervisor"
         
