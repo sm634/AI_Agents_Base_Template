@@ -1,6 +1,6 @@
 # load environment variables
 from dotenv import load_dotenv
-_ = load_dotenv()
+_ = load_dotenv(override=True)
 
 import streamlit as st
 import streamlit.components.v1 as components
@@ -38,10 +38,10 @@ except LookupError:
 
 def send_report_via_gmail(
     to_email,
-    subject="Your DevOpsAssist Report",
+    subject="Your Report",
     body="Please find the attached report.",
     report_path="reports/combined_report.html",
-    from_email="sivajimanju11@gmail.com",
+    from_email="mukhiasafal740@gmail.com",
     from_password="yqny bukq oeit rsgd",
     smtp_server="smtp.gmail.com",
     smtp_port=587
@@ -70,8 +70,7 @@ def get_graph():
 
 graph = get_graph()
 
-st.title("DevOpsAssist")
-st.sidebar.image('images/Finastra-logo.jpg', use_container_width=True)
+st.title("IT Productivity Agent")
 st.sidebar.image('images/devops.jpg', use_container_width=True)
 
 # --- Sidebar: Report generation query and parameters ---

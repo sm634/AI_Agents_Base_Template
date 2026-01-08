@@ -2,7 +2,7 @@ import argparse
 from dotenv import load_dotenv
 _ = load_dotenv(override=True)
 
-from tests.test_api import (
+from tests_evals.test_api import (
     test_postgres_create_table, 
     test_postgres_insert_data, 
     test_postgres_query_data,
@@ -11,7 +11,7 @@ from tests.test_api import (
     test_postgres_list_table_schemas,
     test_validate_with_pglast
 )
-from tests.test_llms import (
+from tests_evals.test_llms import (
     test_postgres_agent_tools,
     test_vectordb_agent_tools,
 )
