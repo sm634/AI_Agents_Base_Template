@@ -12,7 +12,7 @@ An AI-powered multi-agent system designed to enhance IT productivity by intellig
 1. Navigate to the parent directory of the repo:
 
 ```bash
-cd ...\DevOpsAssist
+cd ...\IT_Productivity_Agent
 ```
 
 2. Run the following conda command:
@@ -32,7 +32,7 @@ conda activate devops_agent_env
 1. Navigate to the parent directory of the repo:
 
 ```bash
-cd ...\DevOpsAssist
+cd ...\IT_Productivity_Agent
 ```
 
 2. Run the following command on your terminal to create a virtual environment:
@@ -73,7 +73,7 @@ The application will launch in your default web browser, providing an interactiv
 ## Repository Structure
 
 ```
-DevOpsAssist/
+IT_Productivity_Agent/
 ├── agents/                          # Agent implementations
 │   ├── base_agent.py               # Base agent class with shared functionality
 │   ├── supervisor.py               # Supervisor agent for routing queries

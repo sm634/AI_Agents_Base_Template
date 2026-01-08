@@ -44,7 +44,7 @@ class MilvusConnector:
         )
     
 
-    def search_milvus(self, query_text: str, top_k: int = 3, collection_name: str="DevOpsAssist"):
+    def search_milvus(self, query_text: str, top_k: int = 3, collection_name: str="IT_Productivity_Agent"):
         # Embed the query text
         embedding_model = self.get_embedding_model()
         query_vector = embedding_model.embed_query(query_text)

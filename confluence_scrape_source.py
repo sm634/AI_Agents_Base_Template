@@ -38,7 +38,7 @@ embeddings = WatsonxEmbeddings(
 
 # Now initialize the vector store with LangChain Milvus
 vector_store = Milvus(
-    collection_name="DevOpsAssist",    
+    collection_name="IT_Productivity_Agent",
     embedding_function=embeddings,
     connection_args={
         "uri": f"grpc://{os.environ['grpcHost']}:{os.environ['grpcPort']}",

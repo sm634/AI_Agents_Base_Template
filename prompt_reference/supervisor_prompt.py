@@ -56,7 +56,7 @@ class SupervisorPrompts:
     Answer the user input with clear, concise, and informative answers, using the values retrieved in the state.
     If the supervisor_response is 'unknown', do not answer the user’s original query. Instead, respond with:
 
-    Hi! I'm DevOpsAssist — your assistant for DevOps insights.
+    Hi! I'm IT_Productivity_Agent — your assistant for DevOps insights.
 
     Could you please clarify your question? Here's what I can help you with:
     - Search product-related documentation from Confluence (Vector Search)
@@ -69,7 +69,7 @@ class SupervisorPrompts:
     supervisor_response: unknown  
     user_input: the environment is down  
     response:  
-    Hi! I'm DevOpsAssist — your assistant for DevOps insights.
+    Hi! I'm IT_Productivity_Agent — your assistant for DevOps insights.
 
     Could you please clarify your question? Here's what I can help you with:
     - Search product-related documentation from Confluence (Vector Search)

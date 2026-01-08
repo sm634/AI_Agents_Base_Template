@@ -16,7 +16,7 @@ def get_embedding_model():
 def get_vector_store(drop_old=False):
     embeddings = get_embedding_model()
     return Milvus(
-        collection_name="DevOpsAssist",
+        collection_name="IT_Productivity_Agent",
         embedding_function=embeddings,
         connection_args={
             "uri": f"grpc://{os.environ['grpcHost']}:{os.environ['grpcPort']}",
