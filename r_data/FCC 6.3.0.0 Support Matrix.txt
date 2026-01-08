@@ -1,0 +1,1635 @@
+FCC 6.3.0.0 Support Matrix
+Change Summary
+
+FCC On-premise
+
+Browser to OS Matrix
+
+Application Servers to OS Matrix
+
+Servlet 3.x upgrade
+
+Database to OS Matrix
+
+Other Software to OS Matrix
+
+JMS Queue Matrix
+
+Third-party Library
+
+FCC Containerized Deployment (On Kubernetes cluster)
+
+FCC Audit Microservice
+
+Change Summary
+Tech Stack Item
+
+Details
+
+Change type
+
+Priority
+
+Comments
+
+Browser support
+
+All browser version certified with latest version
+
+upgrade
+
+1
+
+ 
+
+Tomcat 11.0.2
+
+New version certification with Open JDK 17
+
+add
+
+3
+
+ 
+
+JDK 17
+
+New certification with Open JDK 17 (app server :Tomcat, Weblogic, JBOSS EAP)
+
+add
+
+2
+
+ 
+
+Tomcat 10.1.34
+
+Upgrade from 10.1.30 to 10.1.34
+
+upgrade
+
+4
+
+ 
+
+Tomcat 9.0.97
+
+Tomcat 9.0.89 upgraded to 9.0.97 on RHEL environment
+
+upgrade
+
+9
+
+ 
+
+WebSphere Liberty server
+
+version 24.0.0.12
+
+WebSphere liberty supports JDK 17, which enables to use spring 6.x library
+
+add
+
+7
+
+ 
+
+Oracle 23ai
+
+Oracle latest version to get certified with FCC
+
+add
+
+12
+
+ 
+
+DB2 13
+
+DB2 13 is a new version to certify FCC
+
+add
+
+5
+
+ 
+
+Active MQ 5.18.6
+
+Active MQ latest version on 5.18.x
+
+upgrade
+
+11
+
+ 
+
+Active MQ 6.1.4
+
+Latest version certification 
+
+add
+
+6
+
+ 
+
+IBM MQ 9.4
+
+New version to be certified 
+
+add
+
+8
+
+ 
+
+Weblogic 14.1.2
+
+Latest version of Weblogic 14 supports JDK 17, this needs certification from JDK 17 support perspective
+
+add
+
+10
+
+ 
+
+FCC On-premise
+Note: The combinations marked "T" means that QA has tested this explicitly (partly or all functionalities). The combinations marked "S" means though we haven't tested, these combinations are implicitly supported.
+
+Color code legends used in the below table.
+
+Manual Testing (M)
+
+Automation Testing (A)
+
+FTB Testing (FTB)
+
+All (M, A, FTB)
+
+ 
+
+ 
+
+ 
+
+ 
+
+Browser to OS Matrix
+The policy for FCC versions in standard support with regards to web browsers is that browsers with 5% or greater market user share as reported by StatCounter will be supported. In addition, the latest version of Safari on OSX (Mac) is also supported.
+
+Operating System
+
+Windows 10
+
+Windows 11
+
+Windows 2019
+
+Windows 2022
+
+macOS 14
+
+(Sonoma)
+
+macOS 15
+
+(Sequoia)
+
+iOS 16 (iPad)
+
+Remarks
+
+ 
+
+Browser
+
+Version
+
+Chrome
+
+135.0.x
+
+ T
+
+T
+
+T
+
+T
+
+ 
+
+ 
+
+ 
+
+132.0.6834.32 released on 4 December 2024
+
+Firefox
+
+137.0.x
+
+ T
+
+T
+
+S
+
+S
+
+ 
+
+ 
+
+ 
+
+133.0 released on 26 November 2024
+
+Microsoft Edge
+
+135.0.x
+
+T
+
+T
+
+S
+
+S
+
+ 
+
+ 
+
+ 
+
+131.0.2903.86 released on 6 December 2024
+
+Safari 
+
+17.4.1
+
+ 
+
+ 
+
+ 
+
+ 
+
+S
+
+S
+
+S
+
+17.4.1 released on 26 November 2024
+
+One dedicated MacBook for QA testing on Safari
+
+TODO: Check with IT team for existing Macbook to upgrade to latest .
+
+Tablet (iPad) - Safari
+
+
+14.7, 15.6, 16.6, 17.4.1
+
+S
+
+ 
+
+Tablet (Android) - Chrome
+
+
+132.0
+
+S
+
+ 
+
+T = Tested : S = Supported
+
+ 
+
+ 
+
+EOL: MacOS 10.x and 11.x will not be supporting as both version support already ended.
+
+
+Note : macOS 12 and 13 will not be supported from this FCC version 6.2.4.0
+
+Note: IE browser is being removed from 6.0.3 due to Angular support limitation with IE, since majority of our UI screens are upgraded with Angular tech-stack.
+
+Browser Usage : Desktop, Tablet & Console Browser Version (Partially Combined) Market Share Worldwide | Statcounter Global Stats 
+
+                              Usage share of web browsers 
+
+Preview unavailable
+ 
+
+ 
+
+Application Servers to OS Matrix
+Operating System
+
+Windows Server 2019
+
+Windows Server 2022
+
+AIX 7.x
+
+Linux 7.x
+
+RHEL 8.x
+
+(Ootpa)
+
+RHEL 9.x
+
+(Plow)
+
+Remarks
+
+QA server Details (only for QA/DevOps reference)
+
+QA Verified
+
+Application Server
+
+Version
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+Tomcat (Open JDK 17)
+
+
+11.0.2
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+T ??
+
+Require changes in context.xml file
+
+ 10.208.76.238
+
+
+ 
+
+Tomcat (Oracle JDK 11)
+
+10.1.x 
+
+10.1.34
+
+S
+
+S
+
+ 
+
+T
+
+S
+
+S
+
+Require changes in context.xml file
+
+QA team: Marina to upgrade one box with 10.1.30
+
+Done-Tested in 6.3
+
+Tomcat (Oracle JDK 8)
+
+
+9.0.97
+
+9.0.89
+
+9.0.82
+
+T
+
+S
+
+ 
+
+T
+
+T
+
+S
+
+ 
+
+10.210.68.177(A)- RHEL 7.6 - Tomcat 9.0.97
+
+10.210.69.6(Windows 2019) - Tomcat 9.0.82
+
+10.210.0.32(Tomcat 9.0.89) RHEL 8.10 - 9.0.89
+
+Done-Tested in 6.3
+
+WebLogic (Oracle JDK 8)
+
+
+12C R2 (12.2.1.4.0)
+
+S
+
+S
+
+ 
+
+S
+
+S
+
+S
+
+ 
+
+ 
+
+NA-No Env available
+
+WebLogic (Oracle JDK 11)
+
+
+14C (14.1.1.0.0)
+
+S
+
+S
+
+ 
+
+T
+
+S
+
+S
+
+ 
+
+10.210.69.76 (RHEL 7.9)
+10.210.68.246(RHEL 7.9)
+
+
+Done-Tested in 6.3
+
+WebLogic (Oracle JDK 17)
+
+
+14C (14.1.2.0.0)
+
+S
+
+S
+
+ 
+
+S
+
+S
+
+T
+
+ 
+
+Weblogic 14.1.2 comes with JDK 17 support
+
+
+NA-No Env available
+
+JBoss EAP
+
+(Open JDK 11)
+
+7.4 GA
+
+S
+
+S
+
+ 
+
+T
+
+T
+
+S
+
+Support: Open JDK 11, Oracle JDK 8
+
+10.210.0.34
+
+10.210.68.88
+
+Check with Devops for AKS version.
+
+JBoss EAP
+
+7.3 GA
+
+S
+
+S
+
+ 
+
+ 
+
+S
+
+S
+
+ 
+
+ 
+
+NA-No Env available
+
+JBoss EAP
+
+7.2.0 GA
+
+S
+
+S
+
+ 
+
+S
+
+S
+
+S
+
+Support Open JDK 11
+
+CBDOP-13933 
+
+NA-No Env available
+
+WebSphere
+
+9.0.5.21 (??)
+
+9.0.5.17 (??)
+
+9.0.5.x
+
+S
+
+S
+
+S
+
+T
+
+S
+
+S
+
+On IBM JDK 8 support (check latest version)
+
+10.210.68.174 
+
+ 
+
+Check with Devops for AKS version.
+
+WebSphere Liberty
+
+
+24.0.0.12
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+NA-No Env available
+
+WildFly
+
+19.1
+
+S
+
+S
+
+ 
+
+ 
+
+S
+
+S
+
+Used by Investec
+
+
+ 
+
+NA-No Env available
+
+T = Tested: S = Supported Combination NT = Not Tested: NS = Not Supported; M = Manual Testing; A = Automation Testing. 
+
+FTB = FCC/TI Certification
+
+ 
+
+ 
+
+ 
+
+ 
+
+Note1: Must use one environment with WebSphere/Tomcat cluster along with a load-balancer.
+
+Note2: Consider RHEL 9.x in one/more environment from FCC 6.2.2 onward
+
+Note3: RHEL 7.x already reached EOL support.
+
+Note4: Websphere 8.5.5.x support is removed from this version 6.2.4.0
+
+Note5: Windows server 2016 support is removed from this version 6.2.4.0
+
+ 
+
+Note : Setup an AIX environment with latest version (>7.2.x) - follow up with DevOps
+
+Servlet 3.x upgrade
+Upgrade Servlet version 4.0 or latest (6.0) ??
+
+Note: WebSphere® Application Server traditional Version 9.0 supports the Servlet 3.1 specification
+
+ 
+
+Database to OS Matrix
+Operating System
+
+Windows Server
+
+2019
+
+Windows Server 
+
+2022
+
+Azure
+
+AIX 7.x
+
+Linux 7.x
+
+RHEL 7.x
+
+(Maipo)
+
+RHEL 8.x
+
+(Ootpa)
+
+RHEL 9.x
+
+(Plow)
+
+Remarks
+
+QA server Details (only for
+
+QA/DevOps reference)
+
+QA Verified
+
+Database
+
+Version
+
+ 
+
+ 
+
+ 
+
+ 
+
+Oracle
+
+19c
+
+S
+
+S
+
+ 
+
+ 
+
+S
+
+T (FTB)
+
+
+S
+
+T
+
+One server OS to be upgraded to RHEL 9.x
+
+10.210.68.192- Windows 2019
+
+10.210.69.5 - RHEL7.x
+
+Done- RHEL 9.4-Tested in 6.3
+
+Oracle
+
+
+23ai (23c)
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+Latest LTS Release
+
+QA Team - Raise the request for installation of Oracle 23ai - Sunita
+
+ 
+
+Pending-NA-No Env available
+
+ 
+
+DB2
+
+11.1.4
+
+
+11.5
+
+S
+
+T
+
+
+ 
+
+S
+
+S
+
+S
+
+S
+
+ 
+
+Need to upgrade to latest version 11.5.x
+
+10.210.68.190 - W19
+
+10.210.68.253 - RHEL7.x
+
+10.208.76.252-New Central India Server
+
+Done- Tested in 6.3
+
+DB2
+
+
+13
+
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+??
+
+
+ 
+
+Pending-NA-No Env available
+
+ 
+
+Microsoft SQL Server
+
+2016 (v12.x)
+
+S
+
+S
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+v2014 EOL in 2019, Extended support till July 2024
+
+10.210.68.193 - A - WS19
+
+NA-No Env available
+
+Microsoft SQL Server
+
+2017 (v14.x)
+
+S
+
+S
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+NA-No Env available
+
+Microsoft SQL Server
+
+ 2019 (v15.x)
+
+
+S
+
+S 
+
+
+ 
+
+ 
+
+ 
+
+T (FTB)
+
+ 
+
+ 
+
+Install 2019 version
+
+
+FTB server (TI Team)
+
+10.210.68.249 - M - WS19
+
+FCC QA team is doiing testing on Windows 2019
+
+Microsoft SQL Server
+
+ 2022 (v16.x)
+
+
+S
+
+T
+
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+10.210.68.249; 10.210.68.193
+
+10.208.76.251-New Central India Server
+
+Done- Tested in 6.3
+
+Azure SQL
+
+ 2016
+
+ 
+
+ 
+
+S
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+NA-No Env available
+
+MySQL
+
+8.0.40
+
+S
+
+ S
+
+
+ 
+
+ 
+
+S
+
+S
+
+
+S
+
+T
+
+Extended support till 30 Apr 2026
+
+10.210.68.252 - M - RHEL7.6
+
+ 
+
+10.208.76.253-New Central India Server
+
+Done- Tested in 6.3
+
+MariaDB
+
+10.6.5
+
+S
+
+S
+
+ 
+
+ 
+
+S
+
+S
+
+S
+
+ 
+
+ 
+
+ 
+
+NA-No Env available
+
+PostgreSQL
+
+13.3
+
+
+S
+
+ 
+
+ 
+
+ 
+
+ 
+
+S
+
+ 
+
+ 
+
+ 
+
+ 
+
+NA-No Env available
+
+PostgreSQL
+
+14.5
+
+ 
+
+S
+
+ 
+
+ 
+
+ 
+
+T
+
+S
+
+ 
+
+ 
+
+10.21.68.253 - A - RHEL7.x -14.5
+
+Move this PostgreSQL to RHEL 9.x env.
+
+Done- Tested in 6.3
+
+PostgreSQL
+
+15.8
+
+
+ 
+
+S
+
+ 
+
+ 
+
+ 
+
+       S
+
+ 
+
+ 
+
+NAB uses PostgreSQL
+
+
+ 
+
+NA-No Env available
+
+PostgreSQL
+
+16.6
+
+
+17.2
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+16.6 (18 Nov 2024)
+
+17.2 (18 Nov 2024)
+
+ 
+
+NA-No Env available
+
+T = Tested/Certified : S = Supported Combination ; M = Manual Testing ; A = Automation Testing ; FTB = FCC/TI Certification
+
+ 
+
+ 
+
+ 
+
+12.1 (12c release 1) already reached EOL in July, 2022. FCC wouldn't support this version. It recommended to upgrade to 12.2 or 19c.
+
+** MS SQL server 14 will have extended support till July 2024, FCC wouldn't support this version. So, it is recommended to upgrade to higher/latest version.
+
+^ MySQL 5.7.x is removed from FCC standard support from this release onward, so it is recommended to upgrade to higher version.
+
+MySQL 8.4 (LTS) is an enterprise version 
+
+Note: SQL server 2022 to be included in FCC 6.2.2 onward (it's already installed in VM 10.210.68.193)
+
+Note: DB2 10.5.x is no more supported from FCC version 6.2.4
+
+Other Software to OS Matrix
+Software
+
+Version
+
+Windows Server 2012
+
+Windows Server 2016
+
+Windows Server 2019
+
+Azure
+
+Linux 7.x
+
+RHEL 7.x
+
+(Maipo)
+
+RHEL 8.x
+
+(Ootpa)
+
+macOS 11
+
+(Big Sur)
+
+Remarks
+
+Elasticsearch
+
+7.17.20
+
+S
+
+S
+
+T
+
+ 
+
+S
+
+S
+
+S
+
+ 
+
+Elasticsearch needs to be used for online help support with PostgreSQL DB. For other DB, it's an optional choice.
+
+Elasticsearch
+
+8.6
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+we can upgrade the existing or install a new version
+
+QA Team:There is no server ???????????
+
+ 
+
+JMS Queue Matrix
+Queue
+
+Version
+
+Support
+
+Released date
+
+Remarks
+
+Active MQ
+
+5.18.3 
+
+5.18.6
+
+T
+
+S
+
+5.18.6 (26-Sep-2024)
+
+FCC/TI FTB and FCC/LIQ
+
+Opics FTB
+
+GPP
+
+Active MQ
+
+6.1.4
+
+
+??
+
+8-Nov-2024
+
+ 
+
+IBM MQ
+
+8.X
+
+S
+
+ 
+
+ 
+
+IBM MQ
+
+9.0.0.18
+
+9.4
+
+9.x
+
+T
+
+??
+
+S
+
+9.4 (18-Jun-2024)
+
+Loan 7.6.4.0
+
+Red Hat AMQ
+
+7.4
+
+S
+
+ 
+
+Need to verify on Dev Environment
+
+Azure Messaging
+
+ 
+
+S
+
+ 
+
+Tested on Azure TaaS (FTB) env.
+
+ 
+
+Note: Need to look at the vulnerability before publishing the technical stack .
+
+Note: Latest version of Active MQ 6.1.4 to be installed, but it has dependency on JRE 17.
+
+Note: IBM MQ 9.4 (with LTS) to be installed in QA environment
+
+Third-party Library
+List if libraries.
+
+SBOM entry?
+
+ 
+
+ 
+
+
+FCC Containerized Deployment (On Kubernetes cluster)
+Following tech-stack is supported for containerized deployment of FCC application. FCC can also integrate with Audit microservice by enabling configuration.
+
+ 
+
+Tech-Stack
+
+Local (Dev box)
+
+On Cloud (Prod, Pre-Prod, UAT)
+
+Reference
+
+Docker
+
+Docker Desktop/Rancher Desktop
+
+AKS cluster
+
+ 
+
+Container Registry
+
+Docker Hub
+
+Azure Container Registry (ACR)
+
+ 
+
+Kubernetes
+
+Mini Cube
+
+Azure Kubernetes Service (AKS) cluster
+
+ 
+
+Database
+
+PostgreSQL (v 14.x)
+
+Oracle 19c (on Azure VM)
+
+Azure PostgreSQL (v 11.x)
+
+Oracle 19c (on Azure VM)
+
+Azure Database for PostgreSQL | Microsoft Azure 
+
+Authorization server
+
+Key-cloak
+
+Key-cloak (v 24.0.1 certified)
+
+Any latest version of key-cloak server can be used
+
+Key vault
+
+ 
+
+Azure key-vault
+
+ 
+
+Redis cache
+
+ 
+
+Redis (Azure Marketplace)
+
+https://marketplace.azurecr.io/helm/v1/repo 
+
+This is an optional 
+
+Available version from Azure marketplace
+
+API Gateway
+
+Ingress API gateway
+
+AKS Ingress API Gateway
+
+ 
+
+Monitoring
+
+ 
+
+Prometheus, Grafana, Loki, Promtail, Node exporter
+
+Grafana support for Prometheus | Prometheus 
+
+Security scan
+
+ 
+
+Arnica (SCA)
+
+Checkmarx (SAST) scan,
+
+DAST scan (Burp Suite Enterprise)
+
+ 
+
+Quality check
+
+ 
+
+Jacoco code coverage
+
+BDD test coverage
+
+Automation test
+
+ 
+
+ 
+
+FCC Audit Microservice
+Following tech-stack is supported for deploying FCC Audit microservice on cloud platform.
+
+ 
+
+Tech-Stack
+
+Local (Dev box)
+
+On Cloud (Prod, Pre-Prod, UAT)
+
+Reference
+
+Tech-Stack
+
+Local (Dev box)
+
+On Cloud (Prod, Pre-Prod, UAT)
+
+Reference
+
+Docker
+
+Docker Desktop/Rancher Desktop
+
+ 
+
+ 
+
+Container Registry
+
+Docker Hub
+
+Azure Container Registry (ACR)
+
+ 
+
+Kubernetes
+
+Mini Cube
+
+Azure Kubernetes Service (AKS) cluster
+
+ 
+
+Database
+
+PostgreSQL
+
+Azure PostgreSQL
+
+Azure Database for PostgreSQL | Microsoft Azure 
+
+Authorization server
+
+Key-cloak
+
+Key-cloak
+
+ 
+
+Key vault
+
+ 
+
+Azure key-vault
+
+ 
+
+JMS Queue
+
+ActiveMQ
+
+ActiveMQ
+
+Any latest version of ActiveMQ can be used
+
+API Gateway
+
+ 
+
+Kong Ingress API Gateway
+
+ 
+
+Monitoring
+
+ 
+
+Prometheus, Grafana
+
+Grafana support for Prometheus | Prometheus 
+
+Quality check
+
+ 
+
+Jacoco code coverage
+
+BDD test coverage
+
+ 
+
+Security scan
+
+ 
+
+Arnica (SCA)
+
+Checkmarx (SAST) scan,
+
+DAST scan (Burp Suite Enterprise)
+
+ 
+
+Performance test
+
+ 
+
+Gatling (for API performance testing)
+
+ 
+
